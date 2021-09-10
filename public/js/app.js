@@ -2199,6 +2199,45 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   data: function data() {
     return {
@@ -2231,11 +2270,13 @@ __webpack_require__.r(__webpack_exports__);
         text: "Options",
         value: "actions"
       }],
+      menu: false,
       tickets: [],
       loading: true,
       errors: {},
       dialog: false,
       delete_dialog: false,
+      delete_id: null,
       id: null,
       title: null,
       description: null,
@@ -2306,8 +2347,16 @@ __webpack_require__.r(__webpack_exports__);
     },
     deleteDialog: function deleteDialog(ticket) {
       this.delete_dialog = true;
+      this.delete_id = ticket.id;
     },
-    deleteTicket: function deleteTicket() {}
+    deleteTicket: function deleteTicket() {
+      var _this3 = this;
+
+      axios["delete"]("api/tickets/".concat(this.delete_id)).then(function (r) {
+        _this3.delete_dialog = false;
+        _this3.delete_id = null;
+      });
+    }
   }
 });
 
@@ -38547,7 +38596,14 @@ var render = function() {
                             { attrs: { cols: "12" } },
                             [
                               _c("v-text-field", {
-                                attrs: { label: "Title", required: "" },
+                                attrs: {
+                                  label: "Title",
+                                  required: "",
+                                  error: !!_vm.errors.title,
+                                  "error-messages": _vm.errors.title
+                                    ? _vm.errors.title[0]
+                                    : ""
+                                },
                                 model: {
                                   value: _vm.title,
                                   callback: function($$v) {
@@ -38565,7 +38621,14 @@ var render = function() {
                             { attrs: { cols: "12" } },
                             [
                               _c("v-textarea", {
-                                attrs: { label: "Description", required: "" },
+                                attrs: {
+                                  label: "Description",
+                                  required: "",
+                                  error: !!_vm.errors.description,
+                                  "error-messages": _vm.errors.description
+                                    ? _vm.errors.description[0]
+                                    : ""
+                                },
                                 model: {
                                   value: _vm.description,
                                   callback: function($$v) {
@@ -38580,19 +38643,135 @@ var render = function() {
                           _vm._v(" "),
                           _c(
                             "v-col",
-                            { staticClass: "d-flex", attrs: { cols: "12" } },
+                            { attrs: { cols: "12" } },
                             [
-                              _c("v-date-picker", {
-                                staticClass: "mx-auto",
-                                attrs: { label: "Due", required: "" },
-                                model: {
-                                  value: _vm.due,
-                                  callback: function($$v) {
-                                    _vm.due = $$v
+                              _c(
+                                "v-menu",
+                                {
+                                  ref: "menu",
+                                  attrs: {
+                                    "close-on-content-click": false,
+                                    "return-value": _vm.due,
+                                    transition: "scale-transition",
+                                    "offset-y": "",
+                                    "min-width": "auto"
                                   },
-                                  expression: "due"
-                                }
-                              })
+                                  on: {
+                                    "update:returnValue": function($event) {
+                                      _vm.due = $event
+                                    },
+                                    "update:return-value": function($event) {
+                                      _vm.due = $event
+                                    }
+                                  },
+                                  scopedSlots: _vm._u([
+                                    {
+                                      key: "activator",
+                                      fn: function(ref) {
+                                        var on = ref.on
+                                        var attrs = ref.attrs
+                                        return [
+                                          _c(
+                                            "v-text-field",
+                                            _vm._g(
+                                              _vm._b(
+                                                {
+                                                  attrs: {
+                                                    label: "Due",
+                                                    "prepend-icon":
+                                                      "mdi-calendar",
+                                                    readonly: "",
+                                                    error: !!_vm.errors.due,
+                                                    "error-messages": _vm.errors
+                                                      .due
+                                                      ? _vm.errors.due[0]
+                                                      : ""
+                                                  },
+                                                  model: {
+                                                    value: _vm.due,
+                                                    callback: function($$v) {
+                                                      _vm.due = $$v
+                                                    },
+                                                    expression: "due"
+                                                  }
+                                                },
+                                                "v-text-field",
+                                                attrs,
+                                                false
+                                              ),
+                                              on
+                                            )
+                                          )
+                                        ]
+                                      }
+                                    }
+                                  ]),
+                                  model: {
+                                    value: _vm.menu,
+                                    callback: function($$v) {
+                                      _vm.menu = $$v
+                                    },
+                                    expression: "menu"
+                                  }
+                                },
+                                [
+                                  _vm._v(" "),
+                                  _c(
+                                    "v-date-picker",
+                                    {
+                                      attrs: { "first-day-of-week": "1" },
+                                      model: {
+                                        value: _vm.due,
+                                        callback: function($$v) {
+                                          _vm.due = $$v
+                                        },
+                                        expression: "due"
+                                      }
+                                    },
+                                    [
+                                      _c("v-spacer"),
+                                      _vm._v(" "),
+                                      _c(
+                                        "v-btn",
+                                        {
+                                          attrs: { text: "", color: "primary" },
+                                          on: {
+                                            click: function($event) {
+                                              _vm.menu = false
+                                            }
+                                          }
+                                        },
+                                        [
+                                          _vm._v(
+                                            "\n                                        Cancel\n                                    "
+                                          )
+                                        ]
+                                      ),
+                                      _vm._v(" "),
+                                      _c(
+                                        "v-btn",
+                                        {
+                                          attrs: { text: "", color: "primary" },
+                                          on: {
+                                            click: function($event) {
+                                              return _vm.$refs.menu.save(
+                                                _vm.due
+                                              )
+                                            }
+                                          }
+                                        },
+                                        [
+                                          _vm._v(
+                                            "\n                                        OK\n                                    "
+                                          )
+                                        ]
+                                      )
+                                    ],
+                                    1
+                                  )
+                                ],
+                                1
+                              )
                             ],
                             1
                           ),
@@ -38605,7 +38784,11 @@ var render = function() {
                                 attrs: {
                                   label: "Status",
                                   type: "number",
-                                  required: ""
+                                  required: "",
+                                  error: !!_vm.errors.status,
+                                  "error-messages": _vm.errors.status
+                                    ? _vm.errors.status[0]
+                                    : ""
                                 },
                                 model: {
                                   value: _vm.status,
@@ -38640,6 +38823,7 @@ var render = function() {
                       on: {
                         click: function($event) {
                           _vm.dialog = false
+                          _vm.id = null
                         }
                       }
                     },
@@ -38706,6 +38890,7 @@ var render = function() {
                       on: {
                         click: function($event) {
                           _vm.delete_dialog = false
+                          _vm.delete_id = null
                         }
                       }
                     },

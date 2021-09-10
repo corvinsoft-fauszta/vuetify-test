@@ -16,6 +16,8 @@
                                     label="Title"
                                     required
                                     v-model="title"
+                                    :error="!!errors.title"
+                                    :error-messages="errors.title?errors.title[0]:''"
                                 ></v-text-field>
                             </v-col>
                             <v-col cols="12">
@@ -23,19 +25,56 @@
                                     label="Description"
                                     v-model="description"
                                     required
+                                    :error="!!errors.description"
+                                    :error-messages="errors.description?errors.description[0]:''"
                                 ></v-textarea>
                             </v-col>
                             <v-col
                                 cols="12"
-                                class="d-flex"
                             >
-                                <v-date-picker label="Due" v-model="due" class="mx-auto" required>
-                                </v-date-picker>
+                                <v-menu
+                                    ref="menu"
+                                    v-model="menu"
+                                    :close-on-content-click="false"
+                                    :return-value.sync="due"
+                                    transition="scale-transition"
+                                    offset-y
+                                    min-width="auto"
+                                >
+                                    <template v-slot:activator="{on, attrs}">
+                                        <v-text-field
+                                            v-model="due"
+                                            label="Due"
+                                            prepend-icon="mdi-calendar"
+                                            readonly
+                                            v-bind="attrs"
+                                            v-on="on"
+                                            :error="!!errors.due"
+                                            :error-messages="errors.due?errors.due[0]:''"
+                                        ></v-text-field>
+                                    </template>
+                                    <v-date-picker v-model="due" first-day-of-week="1">
+                                        <v-spacer></v-spacer>
+                                        <v-btn text color="primary" @click="menu = false">
+                                            Cancel
+                                        </v-btn>
+                                        <v-btn text color="primary" @click="$refs.menu.save(due)">
+                                            OK
+                                        </v-btn>
+                                    </v-date-picker>
+                                </v-menu>
                             </v-col>
                             <v-col
                                 cols="12"
                             >
-                                <v-text-field label="Status" type="number" v-model="status" required>
+                                <v-text-field
+                                    label="Status"
+                                    type="number"
+                                    v-model="status"
+                                    required
+                                    :error="!!errors.status"
+                                    :error-messages="errors.status?errors.status[0]:''"
+                                >
                                 </v-text-field>
                             </v-col>
                         </v-row>
@@ -46,7 +85,7 @@
                     <v-btn
                         color="blue darken-1"
                         text
-                        @click="dialog = false"
+                        @click="dialog = false; id=null"
                     >
                         Close
                     </v-btn>
@@ -80,7 +119,7 @@
                     <v-btn
                         color="green darken-1"
                         text
-                        @click="delete_dialog = false"
+                        @click="delete_dialog = false; delete_id = null;"
                     >
                         Cancel
                     </v-btn>
@@ -167,11 +206,13 @@ export default {
                     value: "actions",
                 },
             ],
+            menu: false,
             tickets: [],
             loading: true,
             errors: {},
             dialog: false,
             delete_dialog: false,
+            delete_id: null,
 
             id: null,
             title: null,
@@ -238,8 +279,14 @@ export default {
         },
         deleteDialog(ticket) {
             this.delete_dialog = true;
+            this.delete_id = ticket.id;
         },
         deleteTicket() {
+            axios.delete(`api/tickets/${this.delete_id}`)
+                .then(r => {
+                    this.delete_dialog = false
+                    this.delete_id = null
+                })
         },
     }
 }
