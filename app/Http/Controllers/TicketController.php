@@ -30,7 +30,7 @@ class TicketController extends Controller
      * @param \Illuminate\Http\Request $request
      * @return Response
      */
-    public function store(Request $request)
+    public function store(TicketRequest $request)
     {
         $ticket = Ticket::create($request->validated());
         return response($ticket->id, 200);

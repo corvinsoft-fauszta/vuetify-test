@@ -6,7 +6,7 @@
         >
             <v-card>
                 <v-card-title>
-                    <span class="text-h5">User Profile</span>
+                    <span class="text-h5"></span>
                 </v-card-title>
                 <v-card-text>
                     <v-container>
@@ -135,9 +135,14 @@
             </v-card>
         </v-dialog>
         <v-card class="elevation-5">
-            <v-card-text>
-                <h1>Tickets</h1>
-            </v-card-text>
+            <v-row justify="space-between">
+                <v-col>
+                    <h1>Tickets</h1>
+                </v-col>
+                <v-col class="d-flex justify-content-end">
+                    <v-btn color="green" @click="createDialog">Create</v-btn>
+                </v-col>
+            </v-row>
             <v-container>
                 <v-data-table
                     fixed-header
@@ -232,6 +237,10 @@ export default {
             }).catch(e => console.error(e))
                 .finally(() => this.loading = false)
         },
+        createDialog() {
+            this.resetValues();
+            this.dialog = true;
+        },
         editDialog(ticket) {
             this.dialog = true;
             this.id = ticket.id
@@ -250,30 +259,29 @@ export default {
                 due: this.due,
                 status: this.status,
             }).then(response => {
-                this.tickets = this.id ? this.tickets.map(t => {
-                    if (t.id === this.id) {
-                        t.title = this.title;
-                        t.description = this.description;
-                        t.due = this.due;
-                        t.status = this.status;
-                    }
-                    return t;
-                }) : this.tickets.append({
-                    id: response.data,
-                    title: this.title,
-                    description: this.description,
-                    due: this.due,
-                    status: this.status,
-                })
-
-                this.dialog = false;
-                this.id = null;
-                this.title = null;
-                this.description = null;
-                this.due = null;
-                this.status = null;
-            }).catch(e => {
-                this.errors = e.response.data.errors;
+                if (this.id) {
+                    this.tickets = this.tickets.map(t => {
+                        if (t.id === this.id) {
+                            t.title = this.title;
+                            t.description = this.description;
+                            t.due = this.due;
+                            t.status = this.status;
+                        }
+                        return t;
+                    })
+                } else {
+                    this.tickets.push({
+                        id: response.data,
+                        title: this.title,
+                        description: this.description,
+                        due: this.due,
+                        status: this.status,
+                    })
+                }
+                this.resetValues();
+            }).catch(error => {
+                console.log(error);
+                this.errors = error.response.data.errors;
             })
 
         },
@@ -284,10 +292,21 @@ export default {
         deleteTicket() {
             axios.delete(`api/tickets/${this.delete_id}`)
                 .then(r => {
-                    this.delete_dialog = false
-                    this.delete_id = null
+                    this.tickets = this.tickets.filter(t=>t.id !== this.delete_id)
+                    this.resetValues()
                 })
         },
+        resetValues() {
+            this.id = null;
+            this.title = null;
+            this.description = null;
+            this.due = null;
+            this.status = null;
+
+            this.dialog = false;
+            this.delete_dialog = false;
+            this.delete_id = null;
+        }
     }
 }
 </script>

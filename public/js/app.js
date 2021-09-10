@@ -2238,6 +2238,11 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   data: function data() {
     return {
@@ -2300,6 +2305,10 @@ __webpack_require__.r(__webpack_exports__);
         return _this.loading = false;
       });
     },
+    createDialog: function createDialog() {
+      this.resetValues();
+      this.dialog = true;
+    },
     editDialog: function editDialog(ticket) {
       this.dialog = true;
       this.id = ticket.id;
@@ -2319,30 +2328,31 @@ __webpack_require__.r(__webpack_exports__);
         due: this.due,
         status: this.status
       }).then(function (response) {
-        _this2.tickets = _this2.id ? _this2.tickets.map(function (t) {
-          if (t.id === _this2.id) {
-            t.title = _this2.title;
-            t.description = _this2.description;
-            t.due = _this2.due;
-            t.status = _this2.status;
-          }
+        if (_this2.id) {
+          _this2.tickets = _this2.tickets.map(function (t) {
+            if (t.id === _this2.id) {
+              t.title = _this2.title;
+              t.description = _this2.description;
+              t.due = _this2.due;
+              t.status = _this2.status;
+            }
 
-          return t;
-        }) : _this2.tickets.append({
-          id: response.data,
-          title: _this2.title,
-          description: _this2.description,
-          due: _this2.due,
-          status: _this2.status
-        });
-        _this2.dialog = false;
-        _this2.id = null;
-        _this2.title = null;
-        _this2.description = null;
-        _this2.due = null;
-        _this2.status = null;
-      })["catch"](function (e) {
-        _this2.errors = e.response.data.errors;
+            return t;
+          });
+        } else {
+          _this2.tickets.push({
+            id: response.data,
+            title: _this2.title,
+            description: _this2.description,
+            due: _this2.due,
+            status: _this2.status
+          });
+        }
+
+        _this2.resetValues();
+      })["catch"](function (error) {
+        console.log(error);
+        _this2.errors = error.response.data.errors;
       });
     },
     deleteDialog: function deleteDialog(ticket) {
@@ -2353,9 +2363,22 @@ __webpack_require__.r(__webpack_exports__);
       var _this3 = this;
 
       axios["delete"]("api/tickets/".concat(this.delete_id)).then(function (r) {
-        _this3.delete_dialog = false;
-        _this3.delete_id = null;
+        _this3.tickets = _this3.tickets.filter(function (t) {
+          return t.id !== _this3.delete_id;
+        });
+
+        _this3.resetValues();
       });
+    },
+    resetValues: function resetValues() {
+      this.id = null;
+      this.title = null;
+      this.description = null;
+      this.due = null;
+      this.status = null;
+      this.dialog = false;
+      this.delete_dialog = false;
+      this.delete_id = null;
     }
   }
 });
@@ -38578,9 +38601,7 @@ var render = function() {
           _c(
             "v-card",
             [
-              _c("v-card-title", [
-                _c("span", { staticClass: "text-h5" }, [_vm._v("User Profile")])
-              ]),
+              _c("v-card-title", [_c("span", { staticClass: "text-h5" })]),
               _vm._v(" "),
               _c(
                 "v-card-text",
@@ -38919,7 +38940,30 @@ var render = function() {
         "v-card",
         { staticClass: "elevation-5" },
         [
-          _c("v-card-text", [_c("h1", [_vm._v("Tickets")])]),
+          _c(
+            "v-row",
+            { attrs: { justify: "space-between" } },
+            [
+              _c("v-col", [_c("h1", [_vm._v("Tickets")])]),
+              _vm._v(" "),
+              _c(
+                "v-col",
+                { staticClass: "d-flex justify-content-end" },
+                [
+                  _c(
+                    "v-btn",
+                    {
+                      attrs: { color: "green" },
+                      on: { click: _vm.createDialog }
+                    },
+                    [_vm._v("Create")]
+                  )
+                ],
+                1
+              )
+            ],
+            1
+          ),
           _vm._v(" "),
           _c(
             "v-container",
