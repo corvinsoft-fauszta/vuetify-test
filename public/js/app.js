@@ -2086,6 +2086,119 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   data: function data() {
     return {
@@ -2114,9 +2227,20 @@ __webpack_require__.r(__webpack_exports__);
         value: "status",
         sortable: true,
         divider: true
+      }, {
+        text: "Options",
+        value: "actions"
       }],
       tickets: [],
-      loading: true
+      loading: true,
+      errors: {},
+      dialog: false,
+      delete_dialog: false,
+      id: null,
+      title: null,
+      description: null,
+      due: null,
+      status: null
     };
   },
   mounted: function mounted() {
@@ -2134,7 +2258,56 @@ __webpack_require__.r(__webpack_exports__);
       })["finally"](function () {
         return _this.loading = false;
       });
-    }
+    },
+    editDialog: function editDialog(ticket) {
+      this.dialog = true;
+      this.id = ticket.id;
+      this.title = ticket.title;
+      this.description = ticket.description;
+      this.due = ticket.due;
+      this.status = ticket.status;
+    },
+    createOrUpdate: function createOrUpdate() {
+      var _this2 = this;
+
+      var path = this.id ? "api/tickets/".concat(this.id) : "api/tickets";
+      axios.post(path, {
+        _method: this.id ? "PATCH" : "POST",
+        title: this.title,
+        description: this.description,
+        due: this.due,
+        status: this.status
+      }).then(function (response) {
+        _this2.tickets = _this2.id ? _this2.tickets.map(function (t) {
+          if (t.id === _this2.id) {
+            t.title = _this2.title;
+            t.description = _this2.description;
+            t.due = _this2.due;
+            t.status = _this2.status;
+          }
+
+          return t;
+        }) : _this2.tickets.append({
+          id: response.data,
+          title: _this2.title,
+          description: _this2.description,
+          due: _this2.due,
+          status: _this2.status
+        });
+        _this2.dialog = false;
+        _this2.id = null;
+        _this2.title = null;
+        _this2.description = null;
+        _this2.due = null;
+        _this2.status = null;
+      })["catch"](function (e) {
+        _this2.errors = e.response.data.errors;
+      });
+    },
+    deleteDialog: function deleteDialog(ticket) {
+      this.delete_dialog = true;
+    },
+    deleteTicket: function deleteTicket() {}
   }
 });
 
@@ -38341,6 +38514,223 @@ var render = function() {
     { attrs: { fluid: "" } },
     [
       _c(
+        "v-dialog",
+        {
+          attrs: { "max-width": "600px" },
+          model: {
+            value: _vm.dialog,
+            callback: function($$v) {
+              _vm.dialog = $$v
+            },
+            expression: "dialog"
+          }
+        },
+        [
+          _c(
+            "v-card",
+            [
+              _c("v-card-title", [
+                _c("span", { staticClass: "text-h5" }, [_vm._v("User Profile")])
+              ]),
+              _vm._v(" "),
+              _c(
+                "v-card-text",
+                [
+                  _c(
+                    "v-container",
+                    [
+                      _c(
+                        "v-row",
+                        [
+                          _c(
+                            "v-col",
+                            { attrs: { cols: "12" } },
+                            [
+                              _c("v-text-field", {
+                                attrs: { label: "Title", required: "" },
+                                model: {
+                                  value: _vm.title,
+                                  callback: function($$v) {
+                                    _vm.title = $$v
+                                  },
+                                  expression: "title"
+                                }
+                              })
+                            ],
+                            1
+                          ),
+                          _vm._v(" "),
+                          _c(
+                            "v-col",
+                            { attrs: { cols: "12" } },
+                            [
+                              _c("v-textarea", {
+                                attrs: { label: "Description", required: "" },
+                                model: {
+                                  value: _vm.description,
+                                  callback: function($$v) {
+                                    _vm.description = $$v
+                                  },
+                                  expression: "description"
+                                }
+                              })
+                            ],
+                            1
+                          ),
+                          _vm._v(" "),
+                          _c(
+                            "v-col",
+                            { staticClass: "d-flex", attrs: { cols: "12" } },
+                            [
+                              _c("v-date-picker", {
+                                staticClass: "mx-auto",
+                                attrs: { label: "Due", required: "" },
+                                model: {
+                                  value: _vm.due,
+                                  callback: function($$v) {
+                                    _vm.due = $$v
+                                  },
+                                  expression: "due"
+                                }
+                              })
+                            ],
+                            1
+                          ),
+                          _vm._v(" "),
+                          _c(
+                            "v-col",
+                            { attrs: { cols: "12" } },
+                            [
+                              _c("v-text-field", {
+                                attrs: {
+                                  label: "Status",
+                                  type: "number",
+                                  required: ""
+                                },
+                                model: {
+                                  value: _vm.status,
+                                  callback: function($$v) {
+                                    _vm.status = $$v
+                                  },
+                                  expression: "status"
+                                }
+                              })
+                            ],
+                            1
+                          )
+                        ],
+                        1
+                      )
+                    ],
+                    1
+                  )
+                ],
+                1
+              ),
+              _vm._v(" "),
+              _c(
+                "v-card-actions",
+                [
+                  _c("v-spacer"),
+                  _vm._v(" "),
+                  _c(
+                    "v-btn",
+                    {
+                      attrs: { color: "blue darken-1", text: "" },
+                      on: {
+                        click: function($event) {
+                          _vm.dialog = false
+                        }
+                      }
+                    },
+                    [_vm._v("\n                    Close\n                ")]
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "v-btn",
+                    {
+                      attrs: { color: "blue darken-1", text: "" },
+                      on: {
+                        click: function($event) {
+                          return _vm.createOrUpdate()
+                        }
+                      }
+                    },
+                    [_vm._v("\n                    Save\n                ")]
+                  )
+                ],
+                1
+              )
+            ],
+            1
+          )
+        ],
+        1
+      ),
+      _vm._v(" "),
+      _c(
+        "v-dialog",
+        {
+          attrs: { "max-width": "290" },
+          model: {
+            value: _vm.delete_dialog,
+            callback: function($$v) {
+              _vm.delete_dialog = $$v
+            },
+            expression: "delete_dialog"
+          }
+        },
+        [
+          _c(
+            "v-card",
+            [
+              _c("v-card-title", { staticClass: "text-h5" }, [
+                _vm._v("\n                Delete ticket\n            ")
+              ]),
+              _vm._v(" "),
+              _c("v-card-text", [
+                _vm._v(
+                  "\n                Do you want to delete this\n            "
+                )
+              ]),
+              _vm._v(" "),
+              _c(
+                "v-card-actions",
+                [
+                  _c("v-spacer"),
+                  _vm._v(" "),
+                  _c(
+                    "v-btn",
+                    {
+                      attrs: { color: "green darken-1", text: "" },
+                      on: {
+                        click: function($event) {
+                          _vm.delete_dialog = false
+                        }
+                      }
+                    },
+                    [_vm._v("\n                    Cancel\n                ")]
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "v-btn",
+                    {
+                      attrs: { color: "red darken-1", text: "" },
+                      on: { click: _vm.deleteTicket }
+                    },
+                    [_vm._v("\n                    Delete\n                ")]
+                  )
+                ],
+                1
+              )
+            ],
+            1
+          )
+        ],
+        1
+      ),
+      _vm._v(" "),
+      _c(
         "v-card",
         { staticClass: "elevation-5" },
         [
@@ -38357,7 +38747,113 @@ var render = function() {
                   items: _vm.tickets,
                   loading: _vm.loading,
                   "loading-text": "Loading please wait..."
-                }
+                },
+                scopedSlots: _vm._u([
+                  {
+                    key: "item.actions",
+                    fn: function(ref) {
+                      var item = ref.item
+                      return [
+                        _c(
+                          "v-tooltip",
+                          {
+                            scopedSlots: _vm._u(
+                              [
+                                {
+                                  key: "activator",
+                                  fn: function(on, attrs) {
+                                    return [
+                                      _c(
+                                        "v-btn",
+                                        _vm._g(
+                                          _vm._b(
+                                            {
+                                              attrs: { icon: "" },
+                                              on: {
+                                                click: function($event) {
+                                                  return _vm.editDialog(item)
+                                                }
+                                              }
+                                            },
+                                            "v-btn",
+                                            attrs,
+                                            false
+                                          ),
+                                          on
+                                        ),
+                                        [
+                                          _c(
+                                            "v-icon",
+                                            { attrs: { small: "" } },
+                                            [_vm._v("mdi-pencil")]
+                                          )
+                                        ],
+                                        1
+                                      )
+                                    ]
+                                  }
+                                }
+                              ],
+                              null,
+                              true
+                            )
+                          },
+                          [_vm._v(" "), _c("span", [_vm._v("Edit")])]
+                        ),
+                        _vm._v(" "),
+                        _c(
+                          "v-tooltip",
+                          {
+                            scopedSlots: _vm._u(
+                              [
+                                {
+                                  key: "activator",
+                                  fn: function(on, attrs) {
+                                    return [
+                                      _c(
+                                        "v-btn",
+                                        _vm._g(
+                                          _vm._b(
+                                            {
+                                              attrs: { icon: "" },
+                                              on: {
+                                                click: function($event) {
+                                                  return _vm.deleteDialog(item)
+                                                }
+                                              }
+                                            },
+                                            "v-btn",
+                                            attrs,
+                                            false
+                                          ),
+                                          on
+                                        ),
+                                        [
+                                          _c(
+                                            "v-icon",
+                                            {
+                                              staticClass: "darken-1",
+                                              attrs: { small: "", color: "red" }
+                                            },
+                                            [_vm._v("mdi-trash-can")]
+                                          )
+                                        ],
+                                        1
+                                      )
+                                    ]
+                                  }
+                                }
+                              ],
+                              null,
+                              true
+                            )
+                          },
+                          [_vm._v(" "), _c("span", [_vm._v("Edit")])]
+                        )
+                      ]
+                    }
+                  }
+                ])
               })
             ],
             1
