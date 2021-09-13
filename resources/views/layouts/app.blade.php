@@ -42,9 +42,25 @@
                         <v-list-item-content>
                             <v-list-item-title>Tickets</v-list-item-title>
                         </v-list-item-content>
-                        @endauth()
                     </v-list-item>
+                @endauth()
+
             </v-list>
+            @auth()
+                <template v-slot:append>
+                    <form ref="logout" method="POST" action="{{ route("logout") }}">
+                        @csrf
+                        <v-list-item role="button">
+                            <v-list-item-icon>
+                                <v-icon>mdi-logout-variant</v-icon>
+                            </v-list-item-icon>
+                            <v-list-item-content @click="$refs['logout'].submit();">
+                                Logout
+                            </v-list-item-content>
+                        </v-list-item>
+                    </form>
+                </template>
+            @endauth
         </v-navigation-drawer>
         <v-main>
             @yield('content')
