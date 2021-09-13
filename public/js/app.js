@@ -2065,6 +2065,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) { symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); } keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+//
+//
 //
 //
 //
@@ -2282,11 +2290,7 @@ __webpack_require__.r(__webpack_exports__);
       dialog: false,
       delete_dialog: false,
       delete_id: null,
-      id: null,
-      title: null,
-      description: null,
-      due: null,
-      status: null
+      selectedTicket: {}
     };
   },
   mounted: function mounted() {
@@ -2306,52 +2310,37 @@ __webpack_require__.r(__webpack_exports__);
       });
     },
     createDialog: function createDialog() {
-      this.resetValues();
+      this.selectedTicket = {};
       this.dialog = true;
     },
     editDialog: function editDialog(ticket) {
       this.dialog = true;
-      this.id = ticket.id;
-      this.title = ticket.title;
-      this.description = ticket.description;
-      this.due = ticket.due;
-      this.status = ticket.status;
+      this.selectedTicket = ticket;
     },
     createOrUpdate: function createOrUpdate() {
       var _this2 = this;
 
       var path = this.id ? "api/tickets/".concat(this.id) : "api/tickets";
-      axios.post(path, {
-        _method: this.id ? "PATCH" : "POST",
-        title: this.title,
-        description: this.description,
-        due: this.due,
-        status: this.status
-      }).then(function (response) {
-        if (_this2.id) {
+      axios.post(path, _objectSpread({
+        _method: this.id ? "PATCH" : "POST"
+      }, this.selectedTicket)).then(function (response) {
+        if (_this2.selectedTicket.id) {
           _this2.tickets = _this2.tickets.map(function (t) {
-            if (t.id === _this2.id) {
-              t.title = _this2.title;
-              t.description = _this2.description;
-              t.due = _this2.due;
-              t.status = _this2.status;
+            if (t.id === _this2.selectedTicket.id) {
+              t = _this2.selectedTicket;
             }
 
             return t;
           });
         } else {
-          _this2.tickets.push({
-            id: response.data,
-            title: _this2.title,
-            description: _this2.description,
-            due: _this2.due,
-            status: _this2.status
-          });
+          _this2.selectedTicket.id = response.data;
+
+          _this2.tickets.push(_this2.selectedTicket);
         }
 
-        _this2.resetValues();
+        _this2.dialog = false;
+        _this2.selectedTicket = {};
       })["catch"](function (error) {
-        console.log(error);
         _this2.errors = error.response.data.errors;
       });
     },
@@ -2366,19 +2355,9 @@ __webpack_require__.r(__webpack_exports__);
         _this3.tickets = _this3.tickets.filter(function (t) {
           return t.id !== _this3.delete_id;
         });
-
-        _this3.resetValues();
+        _this3.delete_dialog = false;
+        _this3.selectedTicket = {};
       });
-    },
-    resetValues: function resetValues() {
-      this.id = null;
-      this.title = null;
-      this.description = null;
-      this.due = null;
-      this.status = null;
-      this.dialog = false;
-      this.delete_dialog = false;
-      this.delete_id = null;
     }
   }
 });
@@ -38626,11 +38605,11 @@ var render = function() {
                                     : ""
                                 },
                                 model: {
-                                  value: _vm.title,
+                                  value: _vm.selectedTicket.title,
                                   callback: function($$v) {
-                                    _vm.title = $$v
+                                    _vm.$set(_vm.selectedTicket, "title", $$v)
                                   },
-                                  expression: "title"
+                                  expression: "selectedTicket.title"
                                 }
                               })
                             ],
@@ -38651,11 +38630,15 @@ var render = function() {
                                     : ""
                                 },
                                 model: {
-                                  value: _vm.description,
+                                  value: _vm.selectedTicket.description,
                                   callback: function($$v) {
-                                    _vm.description = $$v
+                                    _vm.$set(
+                                      _vm.selectedTicket,
+                                      "description",
+                                      $$v
+                                    )
                                   },
-                                  expression: "description"
+                                  expression: "selectedTicket.description"
                                 }
                               })
                             ],
@@ -38672,17 +38655,25 @@ var render = function() {
                                   ref: "menu",
                                   attrs: {
                                     "close-on-content-click": false,
-                                    "return-value": _vm.due,
+                                    "return-value": _vm.selectedTicket.due,
                                     transition: "scale-transition",
                                     "offset-y": "",
                                     "min-width": "auto"
                                   },
                                   on: {
                                     "update:returnValue": function($event) {
-                                      _vm.due = $event
+                                      return _vm.$set(
+                                        _vm.selectedTicket,
+                                        "due",
+                                        $event
+                                      )
                                     },
                                     "update:return-value": function($event) {
-                                      _vm.due = $event
+                                      return _vm.$set(
+                                        _vm.selectedTicket,
+                                        "due",
+                                        $event
+                                      )
                                     }
                                   },
                                   scopedSlots: _vm._u([
@@ -38709,11 +38700,17 @@ var render = function() {
                                                       : ""
                                                   },
                                                   model: {
-                                                    value: _vm.due,
+                                                    value:
+                                                      _vm.selectedTicket.due,
                                                     callback: function($$v) {
-                                                      _vm.due = $$v
+                                                      _vm.$set(
+                                                        _vm.selectedTicket,
+                                                        "due",
+                                                        $$v
+                                                      )
                                                     },
-                                                    expression: "due"
+                                                    expression:
+                                                      "selectedTicket.due"
                                                   }
                                                 },
                                                 "v-text-field",
@@ -38742,11 +38739,15 @@ var render = function() {
                                     {
                                       attrs: { "first-day-of-week": "1" },
                                       model: {
-                                        value: _vm.due,
+                                        value: _vm.selectedTicket.due,
                                         callback: function($$v) {
-                                          _vm.due = $$v
+                                          _vm.$set(
+                                            _vm.selectedTicket,
+                                            "due",
+                                            $$v
+                                          )
                                         },
-                                        expression: "due"
+                                        expression: "selectedTicket.due"
                                       }
                                     },
                                     [
@@ -38776,7 +38777,7 @@ var render = function() {
                                           on: {
                                             click: function($event) {
                                               return _vm.$refs.menu.save(
-                                                _vm.due
+                                                _vm.selectedTicket.due
                                               )
                                             }
                                           }
@@ -38812,11 +38813,11 @@ var render = function() {
                                     : ""
                                 },
                                 model: {
-                                  value: _vm.status,
+                                  value: _vm.selectedTicket.status,
                                   callback: function($$v) {
-                                    _vm.status = $$v
+                                    _vm.$set(_vm.selectedTicket, "status", $$v)
                                   },
-                                  expression: "status"
+                                  expression: "selectedTicket.status"
                                 }
                               })
                             ],
@@ -38944,7 +38945,9 @@ var render = function() {
             "v-row",
             { attrs: { justify: "space-between" } },
             [
-              _c("v-col", [_c("h1", [_vm._v("Tickets")])]),
+              _c("v-col", [
+                _c("h1", { staticClass: "m-3" }, [_vm._v("Tickets")])
+              ]),
               _vm._v(" "),
               _c(
                 "v-col",
@@ -38953,6 +38956,7 @@ var render = function() {
                   _c(
                     "v-btn",
                     {
+                      staticClass: "m-3",
                       attrs: { color: "green" },
                       on: { click: _vm.createDialog }
                     },

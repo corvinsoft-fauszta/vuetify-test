@@ -1,5 +1,6 @@
 <template>
     <v-container fluid>
+        <!--        CreateOrUpdateDialog-->
         <v-dialog
             v-model="dialog"
             max-width="600px"
@@ -15,7 +16,7 @@
                                 <v-text-field
                                     label="Title"
                                     required
-                                    v-model="title"
+                                    v-model="selectedTicket.title"
                                     :error="!!errors.title"
                                     :error-messages="errors.title?errors.title[0]:''"
                                 ></v-text-field>
@@ -23,7 +24,7 @@
                             <v-col cols="12">
                                 <v-textarea
                                     label="Description"
-                                    v-model="description"
+                                    v-model="selectedTicket.description"
                                     required
                                     :error="!!errors.description"
                                     :error-messages="errors.description?errors.description[0]:''"
@@ -36,14 +37,14 @@
                                     ref="menu"
                                     v-model="menu"
                                     :close-on-content-click="false"
-                                    :return-value.sync="due"
+                                    :return-value.sync="selectedTicket.due"
                                     transition="scale-transition"
                                     offset-y
                                     min-width="auto"
                                 >
                                     <template v-slot:activator="{on, attrs}">
                                         <v-text-field
-                                            v-model="due"
+                                            v-model="selectedTicket.due"
                                             label="Due"
                                             prepend-icon="mdi-calendar"
                                             readonly
@@ -53,12 +54,12 @@
                                             :error-messages="errors.due?errors.due[0]:''"
                                         ></v-text-field>
                                     </template>
-                                    <v-date-picker v-model="due" first-day-of-week="1">
+                                    <v-date-picker v-model="selectedTicket.due" first-day-of-week="1">
                                         <v-spacer></v-spacer>
                                         <v-btn text color="primary" @click="menu = false">
                                             Cancel
                                         </v-btn>
-                                        <v-btn text color="primary" @click="$refs.menu.save(due)">
+                                        <v-btn text color="primary" @click="$refs.menu.save(selectedTicket.due)">
                                             OK
                                         </v-btn>
                                     </v-date-picker>
@@ -70,7 +71,7 @@
                                 <v-text-field
                                     label="Status"
                                     type="number"
-                                    v-model="status"
+                                    v-model="selectedTicket.status"
                                     required
                                     :error="!!errors.status"
                                     :error-messages="errors.status?errors.status[0]:''"
@@ -100,6 +101,7 @@
             </v-card>
 
         </v-dialog>
+        <!--        Delete dialog-->
         <v-dialog
             v-model="delete_dialog"
             max-width="290"
@@ -137,10 +139,10 @@
         <v-card class="elevation-5">
             <v-row justify="space-between">
                 <v-col>
-                    <h1>Tickets</h1>
+                    <h1 class="m-3">Tickets</h1>
                 </v-col>
                 <v-col class="d-flex justify-content-end">
-                    <v-btn color="green" @click="createDialog">Create</v-btn>
+                    <v-btn color="green" class="m-3" @click="createDialog">Create</v-btn>
                 </v-col>
             </v-row>
             <v-container>
@@ -219,11 +221,7 @@ export default {
             delete_dialog: false,
             delete_id: null,
 
-            id: null,
-            title: null,
-            description: null,
-            due: null,
-            status: null,
+            selectedTicket: {},
         }
     },
     mounted() {
@@ -238,49 +236,33 @@ export default {
                 .finally(() => this.loading = false)
         },
         createDialog() {
-            this.resetValues();
+            this.selectedTicket = {};
             this.dialog = true;
         },
         editDialog(ticket) {
             this.dialog = true;
-            this.id = ticket.id
-            this.title = ticket.title
-            this.description = ticket.description
-            this.due = ticket.due
-            this.status = ticket.status
+            this.selectedTicket = ticket
         },
         createOrUpdate() {
             const path = this.id ? `api/tickets/${this.id}` : "api/tickets";
             axios.post(path, {
                 _method: this.id ? "PATCH" : "POST",
-
-                title: this.title,
-                description: this.description,
-                due: this.due,
-                status: this.status,
+                ...this.selectedTicket
             }).then(response => {
-                if (this.id) {
+                if (this.selectedTicket.id) {
                     this.tickets = this.tickets.map(t => {
-                        if (t.id === this.id) {
-                            t.title = this.title;
-                            t.description = this.description;
-                            t.due = this.due;
-                            t.status = this.status;
+                        if (t.id === this.selectedTicket.id) {
+                            t = this.selectedTicket
                         }
                         return t;
                     })
                 } else {
-                    this.tickets.push({
-                        id: response.data,
-                        title: this.title,
-                        description: this.description,
-                        due: this.due,
-                        status: this.status,
-                    })
+                    this.selectedTicket.id = response.data;
+                    this.tickets.push(this.selectedTicket)
                 }
-                this.resetValues();
+                this.dialog = false;
+                this.selectedTicket = {};
             }).catch(error => {
-                console.log(error);
                 this.errors = error.response.data.errors;
             })
 
@@ -292,21 +274,11 @@ export default {
         deleteTicket() {
             axios.delete(`api/tickets/${this.delete_id}`)
                 .then(r => {
-                    this.tickets = this.tickets.filter(t=>t.id !== this.delete_id)
-                    this.resetValues()
+                    this.tickets = this.tickets.filter(t => t.id !== this.delete_id)
+                    this.delete_dialog = false;
+                    this.selectedTicket = {};
                 })
         },
-        resetValues() {
-            this.id = null;
-            this.title = null;
-            this.description = null;
-            this.due = null;
-            this.status = null;
-
-            this.dialog = false;
-            this.delete_dialog = false;
-            this.delete_id = null;
-        }
     }
 }
 </script>

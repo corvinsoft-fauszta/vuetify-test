@@ -25,23 +25,24 @@
             color="grey lighten-3"
         >
             <v-list>
-                    <v-list-item link href="{{ route("home") }}">
-                        <v-list-item-icon>
-                            <v-icon>mdi-home</v-icon>
-                        </v-list-item-icon>
+                <v-list-item link href="{{ route("home") }}">
+                    <v-list-item-icon>
+                        <v-icon>mdi-home</v-icon>
+                    </v-list-item-icon>
 
-                        <v-list-item-content>
-                            <v-list-item-title>Home</v-list-item-title>
-                        </v-list-item-content>
-                    </v-list-item>
+                    <v-list-item-content>
+                        <v-list-item-title>Home</v-list-item-title>
+                    </v-list-item-content>
+                </v-list-item>
+                @auth()
                     <v-list-item link href="{{ route("tickets.index") }}">
                         <v-list-item-icon>
                             <v-icon>mdi-ticket-outline</v-icon>
                         </v-list-item-icon>
-
                         <v-list-item-content>
                             <v-list-item-title>Tickets</v-list-item-title>
                         </v-list-item-content>
+                        @endauth()
                     </v-list-item>
             </v-list>
         </v-navigation-drawer>
