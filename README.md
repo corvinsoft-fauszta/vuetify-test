@@ -9,14 +9,14 @@ php artisan migrate
 php artisan db:seed
 ~~~
 
-###NPM
+### NPM
 Only necessary for development
 ~~~
 npm install
 npm run [dev prod watch hot]
 ~~~
 
-###Credentials
+### Credentials
 ~~~
 user@user.com
 password
