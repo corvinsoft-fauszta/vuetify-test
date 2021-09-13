@@ -227,6 +227,12 @@ export default {
     mounted() {
         this.loadTickets()
     },
+
+    watch: {
+        dialog: function (val) {
+            if (val === false) this.errors = {};
+        }
+    },
     methods: {
         loadTickets() {
             this.loading = true;
