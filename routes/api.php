@@ -19,5 +19,5 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::apiResource("tickets", TicketController::class)->except("index");
-Route::get("tickets-list", [TicketController::class, "list"])->name("tickets.list");
+Route::apiResource("tickets", TicketController::class)->middleware("auth:api")->except("index");
+Route::get("tickets-list", [TicketController::class, "list"])->middleware("auth:api")->name("tickets.list");
